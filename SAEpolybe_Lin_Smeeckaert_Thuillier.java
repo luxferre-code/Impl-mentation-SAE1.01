@@ -194,7 +194,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si messageCode=""01242314244032", la fonction retourne false
 
     boolean estChiffreOK(int chiffre){
-        return chiffre > 0 && chiffre < LARGEUR;
+        return chiffre >= 0 && chiffre < LARGEUR;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -209,6 +209,26 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
 
     boolean estMessageCodeValide(String messageCode){
         if(charAt(messageCode, length(messageCode) - 1) != ' ') { return false; }
+        int nbr_1 = -1, nbr_2 = -1;
+        boolean firstNbrSelect = true;
+        for(int indice = 0; indice < length(messageCode); indice++) {
+            char cara = charAt(messageCode, indice);
+            if(cara == ' ') {
+                if(nbr_1 != -1 && nbr_2 != -1) {
+                    nbr_1 = -1;
+                    nbr_2 = -1;
+                } else { return false; }
+            } else if(firstNbrSelect) {
+                int nbr = cara - '0';
+                if(estChiffreOK(nbr)) { nbr_1 = nbr; firstNbrSelect = false; }
+                else { return false; }
+            } else {
+                int nbr = cara - '0';
+                if(estChiffreOK(nbr)) { nbr_2 = nbr; firstNbrSelect = true; }
+                else { return false; }
+            }
+        }
+        return true;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -216,7 +236,23 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // La fonction estMessageValide vérifie que le message passé en paramètre est valide (càd constitué uniquement de lettres de l'alphabet en majuscule)
 
     boolean estMessageValide(String message){
+        for(int indice = 0; indice < length(message); indice++) {
+            if(!estLettreMajuscule(charAt(message, indice))) { return false; }
+        }
         return true;
+    }
+
+    boolean userUseKey() {
+        boolean useKey = false;
+        String choix = "";
+        do {
+            print("Voulez-vous utiliser une clé de chiffrement ? ");
+            choix = readString();
+            if(equals(choix, "oui")) { useKey = true; }
+            else if(equals(choix, "non")) { useKey = false; }
+            else { println("Merci d'entrer oui ou non."); }
+        } while(!equals(choix, "oui") && !equals(choix, "non"));
+        return useKey;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -239,23 +275,71 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
 
     void algorithm(){
         println("SAE1.01 - Le carré de Polybe");
-        /* En dessous c'est que du test, donc faut le delete a la fin !!! */
-        String carre_base = initialiserCarreSimple();
-        afficherCarre(carre_base);
-        println(coderLettre(carre_base, 'A'));
-        println(coderLettre(carre_base, 'B'));
-        println(coderLettre(carre_base, 'V'));
-        println(coderLettre(carre_base, 'W'));
-        println(coderLettre(carre_base, 'Z'));
-        println("-----------------------------------------");
-        String message_coder = coderMessage("ABCDEFGHIJKLMNOPQRSTUVXYZ", "BONJOUR");
-        println(message_coder);
-        println(decoderMessage("ABCDEFGHIJKLMNOPQRSTUVXYZ", message_coder));
-        println("-----------------------------------------");
-        println(estPresent("Bonjour", 'B'));
-        println(estPresent("Bonjour", 'F'));
-        println("-----------------------------------------");
-        afficherCarre(initialiserCarreAvecCle("BONJOUR"));
+        println("Inventé vers -150 par l'historien éponyme, le carré de Polybe fut notamment utilisé par les nihilistes russes enfermés dans les prisons des tsars. Il s'agit d'un code trivial où chaque lettre de l'alphabet est remplacée par les coordonnées de sa position dans un carré");
+        
+        boolean useKey = userUseKey();
+        
+        String carre = "";
+        if(useKey) {
+            String key = "";
+            do {
+                print("Merci d'entrer une clé valide : ");
+                key = readString();
+            } while(!estCleValide(key));
+            carre = initialiserCarreAvecCle(key);
+        } else {
+            carre = initialiserCarreSimple();
+        }
+
+        int reponse;
+        do {
+            println("Voici le carré de Polybe généré : ");
+            afficherCarre(carre);
+
+            println("0. Stop");
+            println("1. Coder un message");
+            println("2. Décoder un message");
+            println("3. Modifier le mode avec/sans clé");
+            print("Que voulez-vous faire ? ");
+            reponse = readInt();
+            
+            if(reponse == 1) { // Coder le message
+                String message;
+                do {
+                    print("Quelle est le message ? ");
+                    message = readString();
+                } while(!estMessageValide(message));
+                String messageCodé = coderMessage(carre, message);
+                println("Voici votre message codé : " + messageCodé);
+                println("Cliquez sur entrée pour revenir au menu.");
+                String nonUtilisé = readString();
+            } else if(reponse == 2) { //Décoder le message
+                String messageCode;
+                do {
+                    print("Quelle est votre message codé ? ");
+                    messageCode = readString();
+                    if(charAt(messageCode, length(messageCode) - 1) != ' ') { messageCode = messageCode + " "; }
+                } while(!estMessageCodeValide(messageCode));
+                String messageDecode = decoderMessage(carre, messageCode);
+                println("Voici votre message décodé : " + messageDecode);
+                println("Cliquez sur entrée pour revenir au menu.");
+                String nonUtilisé = readString();
+            } else if(reponse == 3) {
+                useKey = userUseKey();
+                if(useKey) {
+                    String key = "";
+                    do {
+                        print("Merci d'entrer une clé valide : ");
+                        key = readString();
+                    } while(!estCleValide(key));
+                    carre = initialiserCarreAvecCle(key);
+                } else {
+                    carre = initialiserCarreSimple();
+                }
+            }
+            
+        } while(reponse != 0);
+        
 
     }
     //////////////////////////////////////////////////////////////////////////  
