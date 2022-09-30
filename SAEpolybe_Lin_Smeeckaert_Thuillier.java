@@ -6,7 +6,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     
     // La fonction String initialiserCarre() retourne une chaine de caractères contenant le carré de Polybe (version de base, sans clé, c'est-à-dire la chaine "ABCDEFGHIJKLMNOPQRSTUVXYZ", le V et le W sont "fusionnés" en V)
     String initialiserCarreSimple(){
-        return "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        return "ABCDEFGHIJKLMNOPQRSTUVXYZ";
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -62,7 +62,15 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // Indication : pensez à la division entière et au modulo
 
     String coderLettre(String carre, char lettre){
-        return "";
+        String resultat = "";
+        for(int ligne = 0; ligne < LARGEUR; ligne++) {
+            for(int colonne = 0; colonne < LARGEUR; colonne++) {
+                if(charAt(carre, 5 * ligne + colonne) == lettre || lettre == 'W' && charAt(carre, 5 * ligne + colonne) == 'V') {
+                    resultat = "" + ligne + colonne;
+                }
+            }
+        }
+        return resultat;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -76,7 +84,11 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // NB : On considère dans cette fonction que le message passé en paramètre est valide (càd constitué uniquement des 26 lettres de l'alphabet en majuscule)
 
     String coderMessage(String carre, String message){
-        return "";
+        String string_coder = "";
+        for(int indice = 0; indice < length(message); indice++) {
+            string_coder = string_coder + coderLettre(carre, charAt(message, indice)) + " ";
+        }
+        return string_coder; 
     }
     //////////////////////////////////////////////////////////////////////////
     
@@ -87,7 +99,14 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // NB : On considère dans cette fonction que le message codé passé en paramètre est valide (càd constitué de paires d'entiers compris entre 0 et LARGEUR-1 inclus et séparées par un espace)
 
     String decoderMessage(String carre, String messageCode){
-        return "";
+        String decoder = "";
+        for(int indice = 1; indice < length(messageCode) - 1; indice = indice + 3) {
+            int nbr_1, nbr_2;
+            nbr_1 = charAt(messageCode, indice - 1) - '0';
+            nbr_2 = charAt(messageCode, indice) - '0';
+            decoder = decoder + charAt(carre, 5 * nbr_1 + nbr_2);
+        }
+        return decoder;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -99,7 +118,10 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //      si mot = "BONJOUR" et lettre = 'M' alors le résultat de la fonction est False
     
     boolean estPresent(String mot, char lettre){
-        return true;
+        for(int indice = 0; indice < length(mot); indice++) {
+            if(charAt(mot, indice) == lettre) { return true; }
+        }
+        return false;
     }
   
     //////////////////////////////////////////////////////////////////////////
@@ -112,7 +134,22 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // NB : On considère dans cette fonction que la clé passée en paramètre est valide (càd constituée uniquement de lettres de l'alphabet en majuscule, le W se substituera en V)
 
     String initialiserCarreAvecCle(String cle){
-        return "";
+        String carreAvecCle = "";
+        String carre_base = initialiserCarreSimple();
+        for(int indice = 0; indice < length(cle); indice++) {
+            char cara = charAt(cle, indice);
+            if(!estPresent(carreAvecCle, cara)) {
+                carreAvecCle = carreAvecCle + cara;
+            }
+        }
+
+        for(int indice = 0; indice < length(carre_base); indice++) {
+            char cara_carre = charAt(carre_base, indice);
+            if(!estPresent(carreAvecCle, cara_carre)) { carreAvecCle = carreAvecCle + cara_carre; }
+        }
+
+        return carreAvecCle;
+
     }
     
     //////////////////////////////////////////////////////////////////////////
@@ -127,7 +164,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si c='B', la fonction retourne true
 
     boolean estLettreMajuscule(char c){
-        return true;
+        return c >= 'A' && c <= 'Z';
     }
    
     //////////////////////////////////////////////////////////////////////////
@@ -140,6 +177,9 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si cle="ButInformatique", la fonction retourne false
    
     boolean estCleValide(String cle){
+        for(int indice = 0; indice < length(cle); indice++) {
+            if(!estLettreMajuscule(charAt(cle, indice))) { return false; }
+        }
         return true;
     }
 
@@ -154,7 +194,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si messageCode=""01242314244032", la fonction retourne false
 
     boolean estChiffreOK(int chiffre){
-        return true;
+        return chiffre > 0 && chiffre < LARGEUR;
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -168,7 +208,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si messageCode=""01242314244032", la fonction retourne false
 
     boolean estMessageCodeValide(String messageCode){
-        return true;
+        if(charAt(messageCode, length(messageCode) - 1) != ' ') { return false; }
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -199,7 +239,24 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
 
     void algorithm(){
         println("SAE1.01 - Le carré de Polybe");
-        afficherCarre(initialiserCarreSimple());
+        /* En dessous c'est que du test, donc faut le delete a la fin !!! */
+        String carre_base = initialiserCarreSimple();
+        afficherCarre(carre_base);
+        println(coderLettre(carre_base, 'A'));
+        println(coderLettre(carre_base, 'B'));
+        println(coderLettre(carre_base, 'V'));
+        println(coderLettre(carre_base, 'W'));
+        println(coderLettre(carre_base, 'Z'));
+        println("-----------------------------------------");
+        String message_coder = coderMessage("ABCDEFGHIJKLMNOPQRSTUVXYZ", "BONJOUR");
+        println(message_coder);
+        println(decoderMessage("ABCDEFGHIJKLMNOPQRSTUVXYZ", message_coder));
+        println("-----------------------------------------");
+        println(estPresent("Bonjour", 'B'));
+        println(estPresent("Bonjour", 'F'));
+        println("-----------------------------------------");
+        afficherCarre(initialiserCarreAvecCle("BONJOUR"));
+
     }
     //////////////////////////////////////////////////////////////////////////  
 }
