@@ -63,12 +63,11 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
 
     String coderLettre(String carre, char lettre){
         String resultat = "";
-        for(int ligne = 0; ligne < LARGEUR; ligne++) {
-            for(int colonne = 0; colonne < LARGEUR; colonne++) {
-                if(charAt(carre, 5 * ligne + colonne) == lettre || lettre == 'W' && charAt(carre, 5 * ligne + colonne) == 'V') {
-                    resultat = "" + ligne + colonne;
-                }
-            }
+        boolean trouver = false;
+        int index = 0;
+        while(!trouver && index < length(carre)) {
+            if(charAt(carre, index) == lettre || lettre == 'W' && charAt(carre, index) == 'V') { resultat = "" + (index / LARGUEUR) + (index % LARGUEUR); }
+            index++;
         }
         return resultat;
     }
