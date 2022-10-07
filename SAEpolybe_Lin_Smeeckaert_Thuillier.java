@@ -66,7 +66,7 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
         boolean trouver = false;
         int index = 0;
         while(!trouver && index < length(carre)) {
-            if(charAt(carre, index) == lettre || lettre == 'W' && charAt(carre, index) == 'V') { resultat = "" + (index / LARGUEUR) + (index % LARGUEUR); }
+            if(charAt(carre, index) == lettre || lettre == 'W' && charAt(carre, index) == 'V') { resultat = "" + (index / LARGEUR) + (index % LARGEUR); }
             index++;
         }
         return resultat;
