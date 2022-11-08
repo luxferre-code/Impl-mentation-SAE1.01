@@ -66,7 +66,10 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
         boolean trouver = false;
         int index = 0;
         while(!trouver && index < length(carre)) {
-            if(charAt(carre, index) == lettre || lettre == 'W' && charAt(carre, index) == 'V') { resultat = "" + (index / LARGEUR) + (index % LARGEUR); }
+            if(charAt(carre, index) == lettre || lettre == 'W' && charAt(carre, index) == 'V') {
+                resultat = "" + (index / LARGEUR) + (index % LARGEUR);
+                trouver = true;
+            }
             index++;
         }
         return resultat;
@@ -116,11 +119,16 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //      si mot = "BONJOUR" et lettre = 'R' alors le résultat de la fonction est True
     //      si mot = "BONJOUR" et lettre = 'M' alors le résultat de la fonction est False
     
-    boolean estPresent(String mot, char lettre){
-        for(int indice = 0; indice < length(mot); indice++) {
+    boolean estPresent(String mot, char lettre){ // A refaire
+        /*for(int indice = 0; indice < length(mot); indice++) {
             if(charAt(mot, indice) == lettre) { return true; }
         }
-        return false;
+        return false;*/
+        int idx = 0;
+        while(idx < length(mot) && charAt(mot, idx) != lettre) {
+            idx++; 
+        }
+        return idx < length(mot);
     }
   
     //////////////////////////////////////////////////////////////////////////
@@ -144,7 +152,9 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
 
         for(int indice = 0; indice < length(carre_base); indice++) {
             char cara_carre = charAt(carre_base, indice);
-            if(!estPresent(carreAvecCle, cara_carre)) { carreAvecCle = carreAvecCle + cara_carre; }
+            if(!estPresent(carreAvecCle, cara_carre)) {
+                carreAvecCle = carreAvecCle + cara_carre;
+            }
         }
 
         return carreAvecCle;
@@ -176,10 +186,15 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si cle="ButInformatique", la fonction retourne false
    
     boolean estCleValide(String cle){
-        for(int indice = 0; indice < length(cle); indice++) {
+        /*for(int indice = 0; indice < length(cle); indice++) {
             if(!estLettreMajuscule(charAt(cle, indice))) { return false; }
         }
-        return true;
+        return true;*/
+        int idx = 0;
+        while(idx < length(cle) && estLettreMajuscule(charAt(cle, idx))) {
+            idx++;
+        }
+        return idx == length(cle);
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -207,8 +222,26 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     //  si messageCode=""01242314244032", la fonction retourne false
 
     boolean estMessageCodeValide(String messageCode){
-        if(charAt(messageCode, length(messageCode) - 1) != ' ') { return false; }
-        int nbr_1 = -1, nbr_2 = -1;
+        boolean valide = true;
+        if(charAt(messageCode, length(messageCode) - 1) != ' ') {
+            valide = false;
+        }
+        else {
+            int idx = 2;
+            while(idx < length(messageCode) && valide) {
+                if(charAt(messageCode, idx) == ' ') {
+                    if(!estChiffreOK(charAt(messageCode, idx - 2) - '0') || !estChiffreOK(charAt(messageCode, idx - 1) - '0')) {
+                        valide = false;
+                    }
+                    idx += 3;
+                }
+                else {
+                    valide = false;
+                }
+            }
+        }
+        return valide;
+        /*int nbr_1 = -1, nbr_2 = -1;
         boolean firstNbrSelect = true;
         for(int indice = 0; indice < length(messageCode); indice++) {
             char cara = charAt(messageCode, indice);
@@ -216,18 +249,35 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
                 if(nbr_1 != -1 && nbr_2 != -1) {
                     nbr_1 = -1;
                     nbr_2 = -1;
-                } else { return false; }
+                } else {
+                    return false;
+                }
             } else if(firstNbrSelect) {
                 int nbr = cara - '0';
-                if(estChiffreOK(nbr)) { nbr_1 = nbr; firstNbrSelect = false; }
-                else { return false; }
+                if(estChiffreOK(nbr)) {
+                    nbr_1 = nbr; firstNbrSelect = false;
+                }
+                else {
+                    return false;
+                }
             } else {
                 int nbr = cara - '0';
-                if(estChiffreOK(nbr)) { nbr_2 = nbr; firstNbrSelect = true; }
-                else { return false; }
+                if(estChiffreOK(nbr)) {
+                    nbr_2 = nbr; firstNbrSelect = true;
+                }
+                else {
+                    return false;
+                }
             }
         }
-        return true;
+        return true;*/
+    }
+    void testEstMessageCodeValide() {
+        assertTrue(estMessageCodeValide("01 24 23 14 24 40 32 "));
+        assertFalse(estMessageCodeValide("01 24 23 14 24 40 32"));
+        assertFalse(estMessageCodeValide("01 24 23 14 24 40 3"));
+        assertFalse(estMessageCodeValide("01 25 23 14 24 40 32 "));
+        assertFalse(estMessageCodeValide("01242314244032"));
     }
 
     //////////////////////////////////////////////////////////////////////////
@@ -235,10 +285,22 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
     // La fonction estMessageValide vérifie que le message passé en paramètre est valide (càd constitué uniquement de lettres de l'alphabet en majuscule)
 
     boolean estMessageValide(String message){
-        for(int indice = 0; indice < length(message); indice++) {
+        /*for(int indice = 0; indice < length(message); indice++) {
             if(!estLettreMajuscule(charAt(message, indice))) { return false; }
         }
-        return true;
+        return true;*/
+        int idx = 0;
+        while(idx < length(message) && estLettreMajuscule(charAt(message, idx))) {
+            idx++;
+        }
+        return idx == length(message);
+    }
+
+    void testEstMessageValide() {
+        assertTrue(estMessageValide("BUTINFORMATIQUE"));
+        assertFalse(estMessageValide("BUTINF ORMATIQUE"));
+        assertFalse(estMessageValide("BUTINFORMATIQUE!"));
+        assertFalse(estMessageValide("ButInformatique"));
     }
 
     boolean userUseKey() {
@@ -317,7 +379,9 @@ class SAEpolybe_Lin_Smeeckaert_Thuillier extends Program {
                 do {
                     print("Quelle est votre message codé ? ");
                     messageCode = readString();
-                    if(charAt(messageCode, length(messageCode) - 1) != ' ') { messageCode = messageCode + " "; }
+                    if(charAt(messageCode, length(messageCode) - 1) != ' ') {
+                        messageCode = messageCode + " ";
+                    }
                 } while(!estMessageCodeValide(messageCode));
                 String messageDecode = decoderMessage(carre, messageCode);
                 println("Voici votre message décodé : " + messageDecode);
